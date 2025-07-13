@@ -65,7 +65,7 @@ async def process_audio(audio: UploadFile = File(...)):
             os.rename(temp_file_path, file_path)
         
         # Process audio through Allosaurus to get IPA characters
-        ipa_result = model.recognize(file_path)
+        ipa_result = model.recognize(file_path, topk=5)
         print(f"IPA result: {ipa_result}")
         
         return {
