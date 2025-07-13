@@ -155,7 +155,7 @@ function App() {
             placeholder="Enter your name"
             onKeyDown={(e) => e.key === 'Enter' && submitName()}
           />
-          <button onClick={submitName} disabled={loading}>
+          <button onClick={submitName} disabled={loading} style={{marginLeft: '1rem'}}>
             Submit Name
           </button>
         </div>
@@ -198,7 +198,7 @@ function App() {
 
       {submittedName && nativeLanguage && targetLanguage && (
         <div className="card">
-          <h2>Audio Recording</h2>
+          <h2>Record Your Pronunciation</h2>
           <button 
             onClick={toggleRecording} 
             disabled={loading}
@@ -218,7 +218,6 @@ function App() {
           )}
           
           {isRecording && <div className="recording-indicator recording">🎤 Recording...</div>}
-          {audioBlob && !isRecording && <div className="recording-indicator success">✅ Audio recorded successfully</div>}
         </div>
       )}
     </>
