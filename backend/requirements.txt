@@ -2,3 +2,4 @@ fastapi[standard]==0.113.0
 git+https://github.com/xinjli/allosaurus.git@interspeech21#egg=allosaurus
 torchaudio
 soundfile
+pydub
