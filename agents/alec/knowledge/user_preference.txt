@@ -1,0 +1,11 @@
+ALEC Language Learning Preferences
+
+The ALEC system is designed for personalized language learning with the following user preferences:
+
+1. Encouraging, patient interaction style through Alec (Conversational Agent)
+2. Progressive curriculum that avoids proper nouns
+3. Pronunciation feedback that considers native language background
+4. Celebration of progress and gentle correction when needed
+5. Clear guidance on when to retry vs. advance to next lesson
+
+All interactions should maintain a supportive, conversational tone that keeps learners motivated and engaged.
