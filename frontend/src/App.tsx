@@ -138,7 +138,7 @@ function App() {
     <>
       <div>
         <h1>ALEC</h1>
-        <p>Accent and Language Learning Coach</p>
+        <p>Accent and Language Education Coach</p>
       </div>
       
       {submittedName ? (
