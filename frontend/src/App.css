@@ -1,5 +1,5 @@
 #root {
-  max-width: 1280px;
+  max-width: 800px;
   margin: 0 auto;
   padding: 2rem;
   text-align: center;
@@ -27,6 +27,26 @@
   }
 }
 
+@keyframes gentle-bounce {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-5px);
+  }
+}
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
 @media (prefers-reduced-motion: no-preference) {
   a:nth-of-type(2) .logo {
     animation: logo-spin infinite 20s linear;
@@ -34,9 +54,68 @@
 }
 
 .card {
-  padding: 2em;
+  padding: 2.5em;
+  background: rgba(255, 255, 255, 0.9);
+  border-radius: 16px;
+  box-shadow: 0 8px 32px rgba(255, 120, 73, 0.1);
+  margin-bottom: 2rem;
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  animation: fade-in 0.6s ease-out;
+  transition: transform 0.3s ease;
+}
+
+.card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 40px rgba(255, 120, 73, 0.15);
 }
 
 .read-the-docs {
-  color: #888;
+  color: var(--warm-gray);
+  font-size: 0.9em;
+  margin-top: 2rem;
+}
+
+/* Recording status indicators */
+.recording-indicator {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1rem;
+  border-radius: 20px;
+  font-size: 0.9em;
+  font-weight: 500;
+  margin-top: 1rem;
+}
+
+.recording-indicator.recording {
+  background: rgba(239, 68, 68, 0.1);
+  color: #dc2626;
+  animation: gentle-bounce 2s ease-in-out infinite;
+}
+
+.recording-indicator.success {
+  background: rgba(16, 185, 129, 0.1);
+  color: var(--success-green);
+}
+
+/* Subtitle styling */
+p {
+  color: var(--warm-gray);
+  font-size: 1.1em;
+  margin-bottom: 2rem;
+}
+
+/* Greeting header styling */
+.greeting-header {
+  margin: 2rem 0;
+  padding: 1rem 0;
+}
+
+.greeting-header h2 {
+  font-size: 2em;
+  font-weight: 600;
+  color: var(--warm-orange);
+  margin: 0;
+  text-shadow: 0 2px 4px rgba(255, 120, 73, 0.1);
 }

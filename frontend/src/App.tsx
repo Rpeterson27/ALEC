@@ -7,6 +7,8 @@ function App() {
   const [error, setError] = useState<string | null>(null)
   const [name, setName] = useState('')
   const [submittedName, setSubmittedName] = useState<string | null>(null)
+  const [nativeLanguage, setNativeLanguage] = useState('')
+  const [targetLanguage, setTargetLanguage] = useState('')
   const [isRecording, setIsRecording] = useState(false)
   const [audioBlob, setAudioBlob] = useState<Blob | null>(null)
   const mediaRecorderRef = useRef<MediaRecorder | null>(null)
@@ -139,27 +141,62 @@ function App() {
         <p>Accent and Language Learning Coach</p>
       </div>
       
-      <div className="card">
-        {submittedName ? (
+      {submittedName ? (
+        <div className="greeting-header">
           <h2>Hi, {submittedName}!</h2>
-        ) : (
-          <>
-            <h2>Enter Your Name</h2>
-            <input
-              type="text"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              placeholder="Enter your name"
-              onKeyDown={(e) => e.key === 'Enter' && submitName()}
-            />
-            <button onClick={submitName} disabled={loading}>
-              Submit Name
-            </button>
-          </>
-        )}
-      </div>
+        </div>
+      ) : (
+        <div className="card">
+          <h2>Enter Your Name</h2>
+          <input
+            type="text"
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            placeholder="Enter your name"
+            onKeyDown={(e) => e.key === 'Enter' && submitName()}
+          />
+          <button onClick={submitName} disabled={loading}>
+            Submit Name
+          </button>
+        </div>
+      )}
 
       {submittedName && (
+        <div className="card">
+          <h2>Language Selection</h2>
+          <div style={{marginBottom: '15px'}}>
+            <label htmlFor="nativeLanguage" style={{display: 'block', marginBottom: '5px'}}>
+              What language do you speak?
+            </label>
+            <select
+              id="nativeLanguage"
+              value={nativeLanguage}
+              onChange={(e) => setNativeLanguage(e.target.value)}
+              style={{width: '100%', padding: '8px'}}
+            >
+              <option value="">Select your native language</option>
+              <option value="English">English</option>
+            </select>
+          </div>
+          
+          <div style={{marginBottom: '15px'}}>
+            <label htmlFor="targetLanguage" style={{display: 'block', marginBottom: '5px'}}>
+              What language would you like to learn?
+            </label>
+            <select
+              id="targetLanguage"
+              value={targetLanguage}
+              onChange={(e) => setTargetLanguage(e.target.value)}
+              style={{width: '100%', padding: '8px'}}
+            >
+              <option value="">Select target language</option>
+              <option value="French">French</option>
+            </select>
+          </div>
+        </div>
+      )}
+
+      {submittedName && nativeLanguage && targetLanguage && (
         <div className="card">
           <h2>Audio Recording</h2>
           <button 
@@ -180,8 +217,8 @@ function App() {
             </button>
           )}
           
-          {isRecording && <p>🎤 Recording...</p>}
-          {audioBlob && !isRecording && <p>✅ Audio recorded successfully</p>}
+          {isRecording && <div className="recording-indicator recording">🎤 Recording...</div>}
+          {audioBlob && !isRecording && <div className="recording-indicator success">✅ Audio recorded successfully</div>}
         </div>
       )}
     </>
