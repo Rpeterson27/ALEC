@@ -72,7 +72,15 @@ def run():
             'target_language': user_profile.target_language,
             'level': user_profile.level,
             'current_lesson': user_profile.current_lesson,
-            'success_rate': user_profile.success_rate
+            'success_rate': user_profile.success_rate,
+            'current_phrase_attempts': user_profile.current_phrase_attempts,
+            'should_offer_to_advance': user_profile.should_offer_to_advance,
+            # Placeholder values for pronunciation analysis tasks
+            'user_ipa': '',
+            'target_phrase': '',
+            'topk_results': [],
+            'curriculum_result': '',
+            'analysis_result': ''
         }
         
         result = alec_crew.crew().kickoff(inputs=inputs)
