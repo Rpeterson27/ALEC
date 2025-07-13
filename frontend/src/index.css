@@ -1,0 +1,120 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Nunito:wght@300;400;500;600;700&display=swap');
+
+:root {
+  font-family: 'Nunito', 'Inter', system-ui, Avenir, Helvetica, Arial, sans-serif;
+  line-height: 1.6;
+  font-weight: 400;
+
+  /* Warm, friendly color palette */
+  --warm-orange: #ff7849;
+  --soft-coral: #ff9472;
+  --cream: #fff8f3;
+  --warm-gray: #6b7280;
+  --deep-navy: #1f2937;
+  --success-green: #10b981;
+  --gentle-blue: #3b82f6;
+  
+  color-scheme: light;
+  color: var(--deep-navy);
+  background: linear-gradient(135deg, var(--cream) 0%, #fef3f0 100%);
+
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+a {
+  font-weight: 500;
+  color: #646cff;
+  text-decoration: inherit;
+}
+a:hover {
+  color: #535bf2;
+}
+
+body {
+  margin: 0;
+  display: flex;
+  place-items: center;
+  min-width: 320px;
+  min-height: 100vh;
+}
+
+h1 {
+  font-size: 3.2em;
+  line-height: 1.1;
+  font-weight: 700;
+  color: var(--warm-orange);
+  margin-bottom: 0.5rem;
+}
+
+h2 {
+  font-weight: 600;
+  color: var(--deep-navy);
+  margin-bottom: 1.5rem;
+}
+
+button {
+  border-radius: 12px;
+  border: 2px solid transparent;
+  padding: 0.8em 1.5em;
+  font-size: 1em;
+  font-weight: 500;
+  font-family: inherit;
+  background: linear-gradient(135deg, var(--warm-orange) 0%, var(--soft-coral) 100%);
+  color: white;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 12px rgba(255, 120, 73, 0.3);
+}
+
+button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(255, 120, 73, 0.4);
+  background: linear-gradient(135deg, var(--soft-coral) 0%, var(--warm-orange) 100%);
+}
+
+button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: 0 2px 8px rgba(255, 120, 73, 0.2);
+}
+
+button:focus,
+button:focus-visible {
+  outline: 3px solid rgba(255, 120, 73, 0.5);
+  outline-offset: 2px;
+}
+
+/* Input and select styling */
+input, select {
+  border-radius: 8px;
+  border: 2px solid #e5e7eb;
+  padding: 0.75em 1em;
+  font-size: 1em;
+  font-family: inherit;
+  background-color: white;
+  color: var(--deep-navy);
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+input:focus, select:focus {
+  outline: none;
+  border-color: var(--warm-orange);
+  box-shadow: 0 0 0 3px rgba(255, 120, 73, 0.1);
+}
+
+input::placeholder {
+  color: var(--warm-gray);
+}
+
+/* Label styling */
+label {
+  color: var(--deep-navy);
+  font-weight: 500;
+}
+
+/* Remove dark mode styles since we want a warm, light theme */
