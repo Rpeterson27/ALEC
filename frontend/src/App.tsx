@@ -217,7 +217,7 @@ function App() {
             </button>
           )}
           
-          {isRecording && <div className="recording-indicator recording">🎤 Recording...</div>}
+          {isRecording && <div className="recording-indicator recording">Recording...</div>}
         </div>
       )}
     </>

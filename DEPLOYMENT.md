@@ -4,10 +4,10 @@ This guide walks through deploying the ALEC language learning crew to CrewAI Ent
 
 ## Prerequisites
 
-✅ **Code Repository**: ALEC crew code pushed to GitHub  
-✅ **CrewAI Enterprise Account**: Access to enterprise.crewai.com  
-✅ **Environment Variables**: Gemini API key ready  
-✅ **Dependencies**: All required packages in pyproject.toml  
+ **Code Repository**: ALEC crew code pushed to GitHub  
+ **CrewAI Enterprise Account**: Access to enterprise.crewai.com  
+ **Environment Variables**: Gemini API key ready  
+ **Dependencies**: All required packages in pyproject.toml  
 
 ## Deployment Methods
 
@@ -27,16 +27,10 @@ This guide walks through deploying the ALEC language learning crew to CrewAI Ent
 3. **Configure Environment Variables**
    Set these **REQUIRED** variables:
    ```
-   MODEL=gemini/gemini-2.5-flash-preview-04-17
+   MODEL=gemini/gemini-2.5-flash
    GEMINI_API_KEY=your_gemini_api_key_here
    ```
    
-   **Optional** variables for Weave tracking:
-   ```
-   WANDB_API_KEY=your_wandb_api_key_here
-   WEAVE_PROJECT_NAME=alec-production
-   ```
-
 4. **Deploy**
    - Click "Deploy" button
    - Monitor deployment progress (10-15 minutes)
@@ -62,7 +56,7 @@ This guide walks through deploying the ALEC language learning crew to CrewAI Ent
 
 4. **Set Environment Variables**
    ```bash
-   crewai deploy env set MODEL=gemini/gemini-2.5-flash-preview-04-17
+   crewai deploy env set MODEL=gemini/gemini-2.5-flash
    crewai deploy env set GEMINI_API_KEY=your_api_key
    ```
 
@@ -77,28 +71,25 @@ This guide walks through deploying the ALEC language learning crew to CrewAI Ent
 
 | Variable | Value | Description |
 |----------|-------|-------------|
-| `MODEL` | `gemini/gemini-2.5-flash-preview-04-17` | Gemini Flash model |
+| `MODEL` | `gemini/gemini-2.5-flash` | Gemini Flash model |
 | `GEMINI_API_KEY` | Your API key | Google AI Studio key |
 
 ### Optional Variables
 
 | Variable | Default | Description |
 |----------|---------|-------------|
-| `WANDB_API_KEY` | None | Weights & Biases tracking |
-| `WEAVE_PROJECT_NAME` | `alec-production` | Weave project name |
 | `DEFAULT_TARGET_LANGUAGE` | `French` | Default learning language |
 | `DEFAULT_NATIVE_LANGUAGE` | `English` | Default native language |
 | `DEFAULT_LEVEL` | `beginner` | Default skill level |
 | `LOG_LEVEL` | `INFO` | Logging verbosity |
-| `DISABLE_WEAVE` | `false` | Disable tracking |
 
 ## Post-Deployment
 
 ### 1. Verify Deployment
 After deployment completes, you'll receive:
-- ✅ Deployment URL
-- ✅ API endpoint URLs
-- ✅ Health check status
+-  Deployment URL
+-  API endpoint URLs
+-  Health check status
 
 ### 2. API Endpoints
 Your deployed ALEC crew will expose these endpoints:
@@ -128,7 +119,6 @@ curl -X POST https://your-deployment-url.crewai.com/sessions \
 
 ### 4. Monitor Performance
 - **CrewAI Dashboard**: View execution metrics
-- **Weave Dashboard**: Detailed AI performance tracking
 - **Logs**: Application and error logs
 
 ## Troubleshooting
@@ -145,7 +135,7 @@ curl -X POST https://your-deployment-url.crewai.com/sessions \
 
 3. **API Errors**
    - Verify Gemini API key has sufficient quota
-   - Check model name is exactly: `gemini/gemini-2.5-flash-preview-04-17`
+   - Check model name is exactly: `gemini/gemini-2.5-flash`
 
 ### Support Channels
 - **CrewAI Support**: enterprise-support@crewai.com
@@ -155,20 +145,19 @@ curl -X POST https://your-deployment-url.crewai.com/sessions \
 ## Production Considerations
 
 ### Security
-- ✅ Environment variables encrypted at rest
-- ✅ API keys never logged or exposed
-- ✅ HTTPS enforced for all endpoints
+-  Environment variables encrypted at rest
+-  API keys never logged or exposed
+-  HTTPS enforced for all endpoints
 
 ### Scaling
-- ✅ Auto-scaling based on demand
-- ✅ Load balancing across instances
-- ✅ Geographic distribution available
+-  Auto-scaling based on demand
+-  Load balancing across instances
+-  Geographic distribution available
 
 ### Monitoring
-- ✅ Built-in health checks
-- ✅ Performance metrics dashboard
-- ✅ Error tracking and alerting
-- ✅ Weave integration for AI observability
+-  Built-in health checks
+-  Performance metrics dashboard
+-  Error tracking and alerting
 
 ## Success Criteria
 
@@ -177,7 +166,6 @@ After deployment, verify these work:
 - [ ] Session creation works with valid user data
 - [ ] Lesson generation returns Gemini-powered responses
 - [ ] Pronunciation analysis processes IPA data
-- [ ] Weave tracking captures all interactions (if enabled)
 - [ ] Error handling gracefully manages failures
 
-Your ALEC language learning crew is now ready for production use! 🚀
+Your ALEC language learning crew is now ready for production use!

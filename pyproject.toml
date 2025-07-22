@@ -6,8 +6,6 @@ authors = [{ name = "Your Name", email = "you@example.com" }]
 requires-python = ">=3.10,<3.14"
 dependencies = [
     "crewai[tools]>=0.141.0,<1.0.0",
-    "weave>=0.50.0",
-    "wandb>=0.16.0",
     "python-dotenv>=1.0.0"
 ]
 
@@ -22,5 +20,7 @@ test = "alec.main:test"
 requires = ["hatchling"]
 build-backend = "hatchling.build"
 
-[tool.crewai]
-type = "crew"
+# CrewAI deployment configuration disabled for local development
+# Future deployment options: GCP instances or migration to Google A2A patterns
+# [tool.crewai]
+# type = "crew"

@@ -17,7 +17,6 @@ encouraging user experience.
 import sys
 import warnings
 import logging
-import weave
 import os
 from typing import Dict, List, Tuple, Optional
 from datetime import datetime
@@ -43,23 +42,9 @@ class AlecAPI:
     consistent user experience.
     """
     
-    def __init__(self, enable_weave: bool = True):
+    def __init__(self):
         self.active_crews: Dict[str, Alec] = {}
         self.logger = logging.getLogger(__name__)
-        self.weave_enabled = enable_weave
-        
-        # Initialize Weave for API-level tracking
-        if self.weave_enabled:
-            self._init_api_weave_tracking()
-    
-    def _init_api_weave_tracking(self) -> None:
-        """Initialize Weave tracking for the API layer"""
-        try:
-            # Weave is already initialized by individual crews, 
-            # but we can add API-level logging here
-            self.logger.info("ALEC API initialized with Weave tracking enabled")
-        except Exception as e:
-            self.logger.warning(f"API Weave tracking setup warning: {e}")
     
     def create_user_session(self, username: str, native_language: str, 
                           target_language: str, level: str) -> str:
@@ -84,7 +69,7 @@ class AlecAPI:
                 level=level
             )
             
-            crew = Alec(user_profile, enable_weave=self.weave_enabled)
+            crew = Alec(user_profile)
             self.active_crews[username] = crew
             
             welcome_message = crew.start_new_session()
@@ -205,25 +190,18 @@ class AlecAPI:
 # Main execution functions for CLI usage
 def run():
     """
-    Run a demo ALEC session with Weave tracking and Gemini Flash.
+    Run a demo ALEC session with Gemini Flash.
     Demonstrates the complete workflow with all three agents.
     """
     try:
         # Check for Gemini configuration
         if not os.getenv('GEMINI_API_KEY'):
-            print("❌ Error: GEMINI_API_KEY not set!")
+            print("Error: GEMINI_API_KEY not set!")
             print("Please set your Google Gemini API key in the .env file")
             return
         
-        model = os.getenv('MODEL', 'gemini/gemini-2.5-flash-preview-04-17')
-        print(f"🤖 Using Gemini model: {model}")
-        
-        # Check for Weave configuration
-        enable_weave = os.getenv('DISABLE_WEAVE', 'false').lower() != 'true'
-        if enable_weave and not os.getenv('WANDB_API_KEY'):
-            print("Warning: WANDB_API_KEY not set. Weave tracking will be disabled.")
-            print("To enable tracking, set your W&B API key and optionally WEAVE_PROJECT_NAME")
-            enable_weave = False
+        model = os.getenv('MODEL', 'gemini/gemini-2.5-flash')
+        print(f"Using Gemini model: {model}")
         
         # Create demo user profile
         user_profile = UserProfile(
@@ -233,14 +211,10 @@ def run():
             level="beginner"
         )
         
-        # Initialize ALEC crew with Weave tracking
-        alec_crew = Alec(user_profile, enable_weave=enable_weave)
+        # Initialize ALEC crew
+        alec_crew = Alec(user_profile)
         
         print("=== ALEC Language Learning Demo ===")
-        if enable_weave:
-            project_name = os.getenv('WEAVE_PROJECT_NAME', 'alec-language-learning')
-            print(f"📊 Weave tracking enabled - Project: {project_name}")
-            print(f"🔗 View traces at: https://wandb.ai/{project_name}/weave")
         
         # Start session
         print("\n1. Starting Session...")
@@ -269,8 +243,6 @@ def run():
         print(f"Alec: {feedback}")
         
         print("\n=== Demo Complete ===")
-        if enable_weave:
-            print("📈 Check your Weave dashboard for detailed tracking data!")
         
     except Exception as e:
         logger.error(f"Error running demo: {e}")

@@ -9,7 +9,6 @@ Only the Conversational Agent interface is exposed to maintain clean user intera
 import sys
 import warnings
 import logging
-import weave
 import os
 from typing import Dict, List, Tuple, Optional
 from datetime import datetime
@@ -28,25 +27,18 @@ logger = logging.getLogger(__name__)
 
 def run():
     """
-    Run a demo ALEC session with Weave tracking and Gemini Flash.
+    Run a demo ALEC session with Gemini Flash.
     Demonstrates the complete workflow with all three agents.
     """
     try:
         # Check for Gemini configuration
         if not os.getenv('GEMINI_API_KEY'):
-            print("❌ Error: GEMINI_API_KEY not set!")
+            print("Error: GEMINI_API_KEY not set!")
             print("Please set your Google Gemini API key in the .env file")
             return
         
-        model = os.getenv('MODEL', 'gemini/gemini-2.5-flash-preview-04-17')
-        print(f"🤖 Using Gemini model: {model}")
-        
-        # Check for Weave configuration
-        enable_weave = os.getenv('DISABLE_WEAVE', 'false').lower() != 'true'
-        if enable_weave and not os.getenv('WANDB_API_KEY'):
-            print("Warning: WANDB_API_KEY not set. Weave tracking will be disabled.")
-            print("To enable tracking, set your W&B API key and optionally WEAVE_PROJECT_NAME")
-            enable_weave = False
+        model = os.getenv('MODEL', 'gemini/gemini-2.5-flash')
+        print(f"Using Gemini model: {model}")
         
         # Create demo user profile
         user_profile = UserProfile(
@@ -56,14 +48,10 @@ def run():
             level="beginner"
         )
         
-        # Initialize ALEC crew with Weave tracking
-        alec_crew = Alec(user_profile, enable_weave=enable_weave)
+        # Initialize ALEC crew
+        alec_crew = Alec(user_profile)
         
         print("=== ALEC Language Learning Demo ===")
-        if enable_weave:
-            project_name = os.getenv('WEAVE_PROJECT_NAME', 'alec-language-learning')
-            print(f"📊 Weave tracking enabled - Project: {project_name}")
-            print(f"🔗 View traces at: https://wandb.ai/{project_name}/weave")
         
         # Kick off the crew
         inputs = {
@@ -87,8 +75,6 @@ def run():
         print(f"Crew result: {result}")
         
         print("\n=== Demo Complete ===")
-        if enable_weave:
-            print("📈 Check your Weave dashboard for detailed tracking data!")
         
     except Exception as e:
         logger.error(f"Error running demo: {e}")

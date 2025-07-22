@@ -22,7 +22,6 @@ from crewai.agents.agent_builder.base_agent import BaseAgent
 from typing import List, Dict, Any, Optional, Tuple
 from dataclasses import dataclass, asdict
 import logging
-import weave
 import os
 from crewai import LLM
 
@@ -103,25 +102,19 @@ class AlecKnowledge:
 class Alec():
     """ALEC Language Learning Crew - Enterprise deployment ready"""
 
-    def __init__(self, user_profile: UserProfile, enable_weave: bool = True):
+    def __init__(self, user_profile: UserProfile):
         """
         Initialize ALEC crew with user profile for shared knowledge.
         
         Args:
             user_profile: User's learning profile and progress data
-            enable_weave: Enable Weights & Biases Weave tracking (default: True)
         """
         super().__init__()
         self.knowledge = AlecKnowledge(user_profile)
         self.logger = logging.getLogger(__name__)
-        self.weave_enabled = enable_weave
         
         # Configure Gemini LLM
         self.llm = self._configure_gemini_llm()
-        
-        # Initialize Weave tracking if enabled
-        if self.weave_enabled:
-            self._init_weave_tracking()
     
     def _configure_gemini_llm(self) -> LLM:
         """
@@ -132,7 +125,7 @@ class Alec():
         """
         try:
             # Get configuration from environment
-            model = os.getenv('MODEL', 'gemini/gemini-2.5-flash-preview-04-17')
+            model = os.getenv('MODEL', 'gemini/gemini-2.5-flash')
             api_key = os.getenv('GEMINI_API_KEY')
             
             if not api_key:
@@ -154,109 +147,12 @@ class Alec():
             self.logger.error(f"Failed to configure Gemini LLM: {e}")
             # Fallback configuration
             return LLM(
-                model="gemini/gemini-2.5-flash-preview-04-17",
+                model="gemini/gemini-2.5-flash",
                 temperature=0.7
             )
     
-    def _init_weave_tracking(self) -> None:
-        """
-        Initialize Weights & Biases Weave tracking for the ALEC crew.
-        
-        Sets up comprehensive tracking of:
-        - Agent interactions and communications
-        - Task executions and results
-        - LLM calls with metadata and token usage
-        - Tool usage and results
-        - Custom metrics for language learning progress
-        """
-        try:
-            # Get project name from environment or use default
-            project_name = os.getenv('WEAVE_PROJECT_NAME', 'alec-language-learning')
-            
-            # Initialize Weave with project name
-            weave.init(project_name=project_name)
-            
-            # Log initialization with user context
-            weave.init_logger()
-            self.logger.info(f"Weave tracking initialized for project: {project_name}")
-            self.logger.info(f"Tracking user: {self.knowledge.user_profile.username} "
-                           f"({self.knowledge.user_profile.native_language} -> "
-                           f"{self.knowledge.user_profile.target_language})")
-            
-        except Exception as e:
-            self.logger.warning(f"Failed to initialize Weave tracking: {e}")
-            self.weave_enabled = False
     
-    @weave.op()
-    def track_learning_session(self, session_type: str, result: str, 
-                              metadata: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
-        """
-        Track learning session events with Weave.
-        
-        Args:
-            session_type: Type of session (welcome, lesson, pronunciation, feedback)
-            result: The output/result from the session
-            metadata: Additional tracking metadata
-            
-        Returns:
-            Dict containing session tracking data
-        """
-        tracking_data = {
-            'session_type': session_type,
-            'username': self.knowledge.user_profile.username,
-            'target_language': self.knowledge.user_profile.target_language,
-            'level': self.knowledge.user_profile.level,
-            'current_lesson': self.knowledge.user_profile.current_lesson,
-            'success_rate': self.knowledge.user_profile.success_rate,
-            'current_phrase_attempts': self.knowledge.user_profile.current_phrase_attempts,
-            'result_length': len(result),
-            'result_preview': result[:100] + "..." if len(result) > 100 else result,
-            'timestamp': weave.timestamp()
-        }
-        
-        if metadata:
-            tracking_data.update(metadata)
-        
-        return tracking_data
     
-    @weave.op()
-    def track_pronunciation_analysis(self, target_phrase: str, user_ipa: str,
-                                   topk_results: List[List[Tuple[str, float]]],
-                                   analysis_result: str, passed: bool) -> Dict[str, Any]:
-        """
-        Track pronunciation analysis with detailed metrics.
-        
-        Args:
-            target_phrase: The target phrase being practiced
-            user_ipa: User's IPA transcription
-            topk_results: Top-K probability results from Allosaurus
-            analysis_result: Feedback from pronunciation coach
-            passed: Whether the attempt passed
-            
-        Returns:
-            Dict containing pronunciation tracking data
-        """
-        # Calculate confidence metrics from top-K results
-        avg_confidence = 0.0
-        if topk_results:
-            confidences = [max(phones, key=lambda x: x[1])[1] for phones in topk_results if phones]
-            avg_confidence = sum(confidences) / len(confidences) if confidences else 0.0
-        
-        tracking_data = {
-            'target_phrase': target_phrase,
-            'user_ipa': user_ipa,
-            'ipa_length': len(user_ipa),
-            'topk_frames': len(topk_results),
-            'avg_confidence': avg_confidence,
-            'passed': passed,
-            'attempt_number': self.knowledge.user_profile.current_phrase_attempts,
-            'analysis_length': len(analysis_result),
-            'feedback_type': 'pass' if passed else 'retry',
-            'native_language': self.knowledge.user_profile.native_language,
-            'user_level': self.knowledge.user_profile.level
-        }
-        
-        return tracking_data
 
     @agent
     def conversational_agent(self) -> Agent:
@@ -385,27 +281,12 @@ class Alec():
             
             result = self.conversational_agent().execute_task(welcome_task)
             
-            # Track session start with Weave
-            if self.weave_enabled:
-                self.track_learning_session(
-                    session_type='welcome',
-                    result=result,
-                    metadata={'session_start': True}
-                )
             
             return result
             
         except Exception as e:
             self.logger.error(f"Error starting session: {e}")
             fallback_result = f"Hello {self.knowledge.user_profile.username}! I'm Alec, ready to help you learn {self.knowledge.user_profile.target_language}!"
-            
-            # Track fallback with Weave
-            if self.weave_enabled:
-                self.track_learning_session(
-                    session_type='welcome_fallback',
-                    result=fallback_result,
-                    metadata={'error': str(e)}
-                )
             
             return fallback_result
 
@@ -438,30 +319,11 @@ class Alec():
             
             result = self.conversational_agent().execute_task(presentation_task)
             
-            # Track lesson delivery with Weave
-            if self.weave_enabled:
-                self.track_learning_session(
-                    session_type='lesson',
-                    result=result,
-                    metadata={
-                        'curriculum_content': curriculum_result[:200] + "..." if len(curriculum_result) > 200 else curriculum_result,
-                        'lesson_number': self.knowledge.user_profile.current_lesson
-                    }
-                )
-            
             return result
             
         except Exception as e:
             self.logger.error(f"Error getting curriculum: {e}")
             fallback_result = "Let's try a new phrase! I'll give you something to practice."
-            
-            # Track fallback with Weave
-            if self.weave_enabled:
-                self.track_learning_session(
-                    session_type='lesson_fallback',
-                    result=fallback_result,
-                    metadata={'error': str(e)}
-                )
             
             return fallback_result
 
@@ -512,28 +374,6 @@ class Alec():
             passed = any(word in analysis_result.lower() for word in ['pass', 'correct', 'good', 'excellent'])
             self.knowledge.update_progress(passed)
             
-            # Track pronunciation analysis with Weave
-            if self.weave_enabled:
-                self.track_pronunciation_analysis(
-                    target_phrase=target_phrase,
-                    user_ipa=user_ipa,
-                    topk_results=topk_results,
-                    analysis_result=analysis_result,
-                    passed=passed
-                )
-                
-                # Track the user-facing result too
-                self.track_learning_session(
-                    session_type='pronunciation_feedback',
-                    result=result,
-                    metadata={
-                        'target_phrase': target_phrase,
-                        'passed': passed,
-                        'attempt_number': self.knowledge.user_profile.current_phrase_attempts,
-                        'should_offer_advance': self.knowledge.user_profile.should_offer_to_advance
-                    }
-                )
-            
             if passed:
                 self.knowledge.advance_lesson()
             
@@ -542,17 +382,5 @@ class Alec():
         except Exception as e:
             self.logger.error(f"Error analyzing pronunciation: {e}")
             fallback_result = "Good effort! Let's try that phrase again, focusing on the pronunciation."
-            
-            # Track fallback with Weave
-            if self.weave_enabled:
-                self.track_learning_session(
-                    session_type='pronunciation_error',
-                    result=fallback_result,
-                    metadata={
-                        'error': str(e),
-                        'target_phrase': target_phrase,
-                        'user_ipa': user_ipa
-                    }
-                )
             
             return fallback_result

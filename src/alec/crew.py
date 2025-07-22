@@ -22,7 +22,6 @@ from crewai.agents.agent_builder.base_agent import BaseAgent
 from typing import List, Dict, Any, Optional, Tuple
 from dataclasses import dataclass, asdict
 import logging
-import weave
 import os
 from crewai import LLM
 
@@ -103,25 +102,19 @@ class AlecKnowledge:
 class Alec():
     """ALEC Language Learning Crew - Enterprise deployment ready"""
 
-    def __init__(self, user_profile: UserProfile, enable_weave: bool = True):
+    def __init__(self, user_profile: UserProfile):
         """
         Initialize ALEC crew with user profile for shared knowledge.
         
         Args:
             user_profile: User's learning profile and progress data
-            enable_weave: Enable Weights & Biases Weave tracking (default: True)
         """
         super().__init__()
         self.knowledge = AlecKnowledge(user_profile)
         self.logger = logging.getLogger(__name__)
-        self.weave_enabled = enable_weave
         
         # Configure Gemini LLM
         self.llm = self._configure_gemini_llm()
-        
-        # Initialize Weave tracking if enabled
-        if self.weave_enabled:
-            self._init_weave_tracking()
     
     def _configure_gemini_llm(self) -> LLM:
         """
@@ -132,7 +125,7 @@ class Alec():
         """
         try:
             # Get configuration from environment
-            model = os.getenv('MODEL', 'gemini/gemini-2.5-flash-preview-04-17')
+            model = os.getenv('MODEL', 'gemini/gemini-2.5-flash')
             api_key = os.getenv('GEMINI_API_KEY')
             
             if not api_key:
@@ -154,68 +147,10 @@ class Alec():
             self.logger.error(f"Failed to configure Gemini LLM: {e}")
             # Fallback configuration
             return LLM(
-                model="gemini/gemini-2.5-flash-preview-04-17",
+                model="gemini/gemini-2.5-flash",
                 temperature=0.7
             )
     
-    def _init_weave_tracking(self) -> None:
-        """
-        Initialize Weights & Biases Weave tracking for the ALEC crew.
-        
-        Sets up comprehensive tracking of:
-        - Agent interactions and communications
-        - Task executions and results
-        - LLM calls with metadata and token usage
-        - Tool usage and results
-        - Custom metrics for language learning progress
-        """
-        try:
-            # Get project name from environment or use default
-            project_name = os.getenv('WEAVE_PROJECT_NAME', 'ALEC')
-            
-            # Initialize Weave with project name
-            weave.init(project_name=project_name)
-            
-            # Log initialization with user context
-            self.logger.info(f"Weave tracking initialized for project: {project_name}")
-            self.logger.info(f"Tracking user: {self.knowledge.user_profile.username} "
-                           f"({self.knowledge.user_profile.native_language} -> "
-                           f"{self.knowledge.user_profile.target_language})")
-            
-        except Exception as e:
-            self.logger.warning(f"Failed to initialize Weave tracking: {e}")
-            self.weave_enabled = False
-    
-    @weave.op()
-    def track_learning_session(self, session_type: str, result: str, 
-                              metadata: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
-        """
-        Track learning session events with Weave.
-        
-        Args:
-            session_type: Type of session (welcome, lesson, pronunciation, feedback)
-            result: The output/result from the session
-            metadata: Additional tracking metadata
-            
-        Returns:
-            Dict containing session tracking data
-        """
-        tracking_data = {
-            'session_type': session_type,
-            'username': self.knowledge.user_profile.username,
-            'target_language': self.knowledge.user_profile.target_language,
-            'level': self.knowledge.user_profile.level,
-            'current_lesson': self.knowledge.user_profile.current_lesson,
-            'success_rate': self.knowledge.user_profile.success_rate,
-            'current_phrase_attempts': self.knowledge.user_profile.current_phrase_attempts,
-            'result_length': len(result),
-            'result_preview': result[:100] + "..." if len(result) > 100 else result
-        }
-        
-        if metadata:
-            tracking_data.update(metadata)
-        
-        return tracking_data
 
     @agent
     def conversational_agent(self) -> Agent:
@@ -321,7 +256,7 @@ class Alec():
 
     @crew
     def crew(self) -> Crew:
-        """Creates the ALEC language learning crew for Enterprise deployment"""
+        """Creates the ALEC language learning crew for local development"""
         return Crew(
             agents=self.agents, # Automatically created by the @agent decorator
             tasks=self.tasks, # Automatically created by the @task decorator
@@ -330,7 +265,7 @@ class Alec():
             memory=True,
             # Use Gemini for all LLM operations
             manager_llm=self.llm,
-            # Use Google's embedding model for consistency
+            # Use Google embedder to avoid OpenAI dependency
             embedder={
                 "provider": "google",
                 "config": {
